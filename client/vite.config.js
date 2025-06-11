@@ -7,4 +7,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000', // Your backend server URL
+        changeOrigin: true, // Needed for virtual hosting sites
+        rewrite: (path) => path.replace(/^\/api/, '/api'), // Rewrite is often optional if target already handles /api
+      },
+    },
+  },
 })

@@ -1,17 +1,25 @@
 // server/models/Movie.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const movieSchema = mongoose.Schema(
   {
-    tmdbId: { // The unique ID for this movie from The Movie Database
+    tmdbId: {
+      // The unique ID for this movie from The Movie Database
       type: String,
       required: true,
       unique: true, // Each TMDB movie should have only one entry in our DB
     },
-    title: { // Store a local copy of the title for easier querying/display
+    title: {
+      // Store a local copy of the title for easier querying/display
       type: String,
       required: true,
     },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review", // References the 'Review' model
+      },
+    ],
     // These fields will aggregate ratings and review counts from *our users*
     averageRating: {
       type: Number,
@@ -29,6 +37,6 @@ const movieSchema = mongoose.Schema(
   }
 );
 
-const Movie = mongoose.model('Movie', movieSchema);
+const Movie = mongoose.model("Movie", movieSchema);
 
 module.exports = Movie;
