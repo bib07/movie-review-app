@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const authRoutes = require('./routes/authRoutes'); // Import auth routes
 const movieRoutes = require('./routes/movieRoutes'); // movieRoutes will use the new logic
+const userRoutes = require('./routes/userRoutes')
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 // Mount Auth Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes); // Uses the updated movie routes
+app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 4000;
 const NODE_ENV = process.env.NODE_ENV || "dev";

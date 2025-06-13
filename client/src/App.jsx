@@ -20,16 +20,13 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-
-            <Route path="/search" element={<MovieSearchPage/>} />
-            <Route path="/movie/:tmdbId" element={<MovieDetailPage/>} />
-
+            <Route path="/search" element={<MovieSearchPage />} />
+            <Route path="/movie/:tmdbId" element={<MovieDetailPage />} />
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               {/* Future protected routes will go here, e.g., /movies/add, /profile */}
             </Route>
-
             {/* Catch-all for 404 (optional, good practice) */}
             <Route
               path="*"
@@ -39,6 +36,8 @@ function App() {
                 </h1>
               }
             />
+            <Route path="/dashboard" element={<DashboardPage />} />{" "}
+            {/* Add this new route */}
           </Routes>
         </main>
         {/* Footer would go here later */}

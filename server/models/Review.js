@@ -27,6 +27,11 @@ const reviewSchema = mongoose.Schema(
       required: false, // Review text is optional, but rating is required
       default: "",
     },
+     movie: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Movie', // This links review to the Movie model
+      required: true, // A review must belong to a movie
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt timestamps

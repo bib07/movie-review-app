@@ -353,7 +353,7 @@ const MovieDetailPage = () => {
       // Check if current user has reviewed this movie
       if (user) {
         const currentUserReview = localData.reviews.find(
-          (review) => review.userId === user.id
+          (review) => review.userId === user._id
         );
         if (currentUserReview) {
           setUserReview(currentUserReview);
@@ -575,8 +575,6 @@ const MovieDetailPage = () => {
             </p>
           )}
 
-          
-
           {/* Review Form */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <h3 className="text-3xl font-bold mb-4">
@@ -689,7 +687,15 @@ const MovieDetailPage = () => {
                       Reviewed on:{" "}
                       {new Date(review.createdAt).toLocaleDateString()}
                     </p>
-                    {user && user.id === review.userId && (
+                    {console.log(`
+                Review ID: ${review._id},
+                Review User ID (from DB): ${review.userId},
+                Current Logged-in User ID: ${user?.id},
+                Comparison: user?.id === review.userId.toString() -> ${
+                  user && user._id === review.userId?.toString()
+                }
+              `)}
+                    {user && user._id === review.userId && (
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => {
