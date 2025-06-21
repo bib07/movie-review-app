@@ -7,9 +7,6 @@ const Review = require("../models/Review");
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
-// console.log("TMDB_API_KEY loaded:", TMDB_API_KEY ? "Yes" : "No"); // Check if it's there
-// console.log("TMDB_BASE_URL:", TMDB_BASE_URL);
-
 // / Helper function to update Movie aggregates (averageRating, numberOfReviews)
 // This will be called after any review create, update, or delete
 const updateMovieAggregates = async (tmdbId, movieTitle) => {
@@ -81,15 +78,15 @@ const getMovieExternalDetails = asyncHandler(async (req, res) => {
   const { tmdbId } = req.params;
 
   // Add console.log here to see what tmdbId is
-  console.log("Received tmdbId:", tmdbId);
+  // console.log("Received tmdbId:", tmdbId);
 
   // Construct the full URL for TMDB
   const requestUrl = `${TMDB_BASE_URL}/movie/${tmdbId}`;
-  console.log("Attempting to fetch from URL:", requestUrl);
-  console.log(
-    "Using API Key (first 5 chars):",
-    TMDB_API_KEY ? TMDB_API_KEY.substring(0, 5) + "..." : "Undefined/Empty"
-  );
+  // console.log("Attempting to fetch from URL:", requestUrl);
+  // console.log(
+  //   "Using API Key (first 5 chars):",
+  //   TMDB_API_KEY ? TMDB_API_KEY.substring(0, 5) + "..." : "Undefined/Empty"
+  // );
 
   try {
     const response = await axios.get(requestUrl, {
@@ -128,9 +125,9 @@ const getReviewsForMovie = asyncHandler(async (req, res) => {
 // @route   POST /api/movies/:tmdbId/reviews
 // @access  Private (User must be logged in)
 const submitReviewAndRating = asyncHandler(async (req, res) => {
-  console.log('--- Inside submitReviewAndRating ---');
-  console.log('req.user:', req.user); // <--- THIS IS CRUCIAL
-  console.log('req.body:', req.body);
+  // console.log("--- Inside submitReviewAndRating ---");
+  // console.log("req.user:", req.user); // <--- THIS IS CRUCIAL
+  // console.log("req.body:", req.body);
   const { tmdbId } = req.params;
   const { rating, reviewText, movieTitle } = req.body;
   const userId = req.user.id; // From req.user, assuming it's `id`
@@ -139,7 +136,7 @@ const submitReviewAndRating = asyncHandler(async (req, res) => {
   // Input validation
   if (!rating || !movieTitle) {
     res.status(400);
-    throw new Error('Please provide a rating and movie title.');
+    throw new Error("Please provide a rating and movie title.");
   }
 
   // Find or create the Movie document in your DB
@@ -164,29 +161,28 @@ const submitReviewAndRating = asyncHandler(async (req, res) => {
     review.rating = rating;
     review.reviewText = reviewText;
     await review.save();
-    res.status(200).json({ message: 'Review updated successfully.', review });
+    res.status(200).json({ message: "Review updated successfully.", review });
   } else {
     // Create new review
     review = await Review.create({
-      tmdbId,          // Your Review model has tmdbId
-      userId,          // Your Review model has userId
-      username,        // Your Review model has username
+      tmdbId, // Your Review model has tmdbId
+      userId, // Your Review model has userId
+      username, // Your Review model has username
       rating,
       reviewText,
-      movie: movie._id // NEW: Link the review to the Movie document's _id
+      movie: movie._id, // NEW: Link the review to the Movie document's _id
     });
 
     // NEW: Add the new review's ID to the Movie document's reviews array
     movie.reviews.push(review._id);
     await movie.save();
 
-    res.status(201).json({ message: 'Review submitted successfully.', review });
+    res.status(201).json({ message: "Review submitted successfully.", review });
   }
 
   // Update aggregate rating for the movie after review submission/update
   // Pass movie's tmdbId or movie._id
   await updateMovieAggregates(tmdbId); // Using tmdbId as your function expects
-
 });
 
 // @desc    Update a specific review
@@ -276,54 +272,6 @@ const getLocalMovieEntry = asyncHandler(async (req, res) => {
   }
 });
 
-// // @desc    Add a review/rating to a movie (or update existing)
-// // @route   POST /api/movies/:tmdbId/reviews
-// // @access  Private
-// const submitReviewAndRating = asyncHandler(async (req, res) => {
-//   const { tmdbId } = req.params;
-//   const { rating, reviewText, movieTitle } = req.body; // movieTitle passed from frontend for local storage
-
-//   if (!rating || rating < 0 || rating > 5) {
-//     res.status(400);
-//     throw new Error("Please provide a valid rating (0-5).");
-//   }
-//   if (!movieTitle) {
-//     res.status(400);
-//     throw new Error("Movie title is required.");
-//   }
-//   // Note: `reviewText` can be optional
-
-//   // Find or create the movie entry in our local database
-//   let movie = await Movie.findOne({ tmdbId });
-
-//   if (!movie) {
-//     // If movie not in our DB, create a new entry for it
-//     movie = await Movie.create({
-//       tmdbId,
-//       title: movieTitle,
-//       averageRating: rating,
-//       numberOfReviews: 1,
-//     });
-//     res
-//       .status(201)
-//       .json({ message: "Movie entry created and review submitted", movie });
-//   } else {
-//     // For now, we'll just update average rating and count (simple implementation)
-//     // In a more complex app, you'd fetch all existing reviews for this movie,
-//     // add the new one, then recalculate the average and count.
-//     // We'll properly implement a separate Review model later.
-//     const newTotalRating = movie.averageRating * movie.numberOfReviews + rating;
-//     const newNumberOfReviews = movie.numberOfReviews + 1;
-//     movie.averageRating = newTotalRating / newNumberOfReviews;
-//     movie.numberOfReviews = newNumberOfReviews;
-
-//     await movie.save();
-//     res
-//       .status(200)
-//       .json({ message: "Review submitted and movie entry updated", movie });
-//   }
-// });
-
 // @desc    Get reviews for a specific movie from our DB
 // @route   GET /api/movies/:tmdbId/reviews
 // @access  Public
@@ -347,24 +295,37 @@ const getMovieReviews = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get popular movies from TMDB
-// @route   GET /api/movies/tmdb/popular
-// @access  Public
 const getPopularMovies = asyncHandler(async (req, res) => {
+  const page = req.query.page || 1;
+  const sortBy = req.query.sortBy || "popularity.desc";
+  const with_genres = req.query.with_genres; // Extract with_genres
+  console.log("Backend: getPopularMovies received sortBy:", sortBy);
+  console.log("Backend: getPopularMovies received with_genres:", with_genres);
+  console.log("Backend: Raw request query:", req.query);
+
+  const apiUrl = `${TMDB_BASE_URL}/discover/movie`; // Always use discover endpoint
+
+  let params = {
+    api_key: TMDB_API_KEY,
+    page: page,
+    language: "en-US",
+    sort_by: sortBy, // <--- Correctly include sort_by here
+  };
+
+  if (with_genres) {
+    params.with_genres = with_genres; // Conditionally add genre
+  }
+
   try {
-    const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
-      params: {
-        api_key: TMDB_API_KEY,
-      },
-    });
-    res.json(response.data);
+    const tmdbRes = await axios.get(apiUrl, { params: params }); // Pass the params object
+    console.log("Backend: TMDB popular movies response received.");
+    res.json(tmdbRes.data);
   } catch (error) {
-    console.error(
-      "TMDB Popular Movies Error:",
-      error.response ? error.response.data : error.message
-    );
-    res.status(error.response?.status || 500);
-    throw new Error("Could not fetch popular movies from TMDB.");
+    console.error("Error fetching popular movies from TMDB:", error.message);
+    res.status(error.response?.status || 500).json({
+      message: "Failed to fetch popular movies.",
+      error: error.response?.data?.status_message || error.message,
+    });
   }
 });
 
@@ -372,20 +333,52 @@ const getPopularMovies = asyncHandler(async (req, res) => {
 // @route   GET /api/movies/tmdb/now_playing
 // @access  Public
 const getNowPlayingMovies = asyncHandler(async (req, res) => {
+  const page = req.query.page || 1;
+  const sortBy = req.query.sortBy || "popularity.desc";
+  const with_genres = req.query.with_genres; // Extract with_genres
+  console.log("Backend: getNowPlayingMovies received sortBy:", sortBy);
+  console.log(
+    "Backend: getNowPlayingMovies received with_genres:",
+    with_genres
+  );
+  console.log("Backend: Raw request query(Now Playing): ", req.query);
+
+  const apiUrl = `${TMDB_BASE_URL}/discover/movie`; // Always use discover endpoint
+
+  let params = {
+    api_key: TMDB_API_KEY,
+    page: page,
+    language: "en-US",
+    sort_by: sortBy, // <--- Correctly include sort_by here
+  };
+
+  if (with_genres) {
+    params.with_genres = with_genres; // Conditionally add genre
+  }
+
+  // For 'now playing', you typically filter by release dates for the discover endpoint
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const twoMonthsAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+
+  params["primary_release_date.gte"] = twoMonthsAgo;
+  params["primary_release_date.lte"] = today;
+  params.vote_count_gte = 10; // Optional: ensure some minimum votes for "now playing" to filter out obscure ones
+
   try {
-    const response = await axios.get(`${TMDB_BASE_URL}/movie/now_playing`, {
-      params: {
-        api_key: TMDB_API_KEY,
-      },
-    });
-    res.json(response.data);
+    const tmdbRes = await axios.get(apiUrl, { params: params }); // Pass the params object
+    console.log("Backend: TMDB now playing movies response received.");
+    res.json(tmdbRes.data);
   } catch (error) {
     console.error(
-      "TMDB Now Playing Movies Error:",
-      error.response ? error.response.data : error.message
+      "Error fetching now playing movies from TMDB:",
+      error.message
     );
-    res.status(error.response?.status || 500);
-    throw new Error("Could not fetch now playing movies from TMDB.");
+    res.status(error.response?.status || 500).json({
+      message: "Failed to fetch now playing movies.",
+      error: error.response?.data?.status_message || error.message,
+    });
   }
 });
 
